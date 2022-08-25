@@ -171,7 +171,9 @@ class UserTasks:
             if duo.get("is_enrolled"):
                 logger.debug(f"User {u.cn.value} is already enrolled in DUO")
                 continue
-            diff = now - datetime.fromtimestamp(duo.get("created"))
+            diff = now - timezone.make_aware(
+                datetime.fromtimestamp(duo.get("created")), timezone=timezone.utc
+            )
             if diff < delta:
                 logger.debug(
                     f"User {u.cn.value} is within enrollment window {diff} for DUO"
