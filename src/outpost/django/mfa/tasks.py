@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 class UserTasks:
-    @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:synchronize")
+    @shared_task(bind=True, ignore_result=False, name=f"{__name__}.User:synchronize")
     def synchronize(task, base, dry_run=False):
         from .models import LockedUser
 
@@ -114,7 +114,7 @@ class UserTasks:
                         logger.error(f"Could not activate {u.cn.value} for DUO")
 
     @shared_task(
-        bind=True, ignore_result=True, name=f"{__name__}.User:enrollment_timeout"
+        bind=True, ignore_result=False, name=f"{__name__}.User:enrollment_timeout"
     )
     def enrollment_timeout(task, base, interval, dry_run=False):
         from .models import LockedUser
@@ -220,7 +220,7 @@ class UserTasks:
                 else:
                     UserTasks.lock(user.pk)
 
-    @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:lock")
+    @shared_task(bind=True, ignore_result=False, name=f"{__name__}.User:lock")
     def lock(task, pk, dry_run=False):
         from .models import LockedUser
 
@@ -272,7 +272,7 @@ class UserTasks:
         if not dry_run:
             user.save()
 
-    @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:unlock")
+    @shared_task(bind=True, ignore_result=False, name=f"{__name__}.User:unlock")
     def unlock(task, pk, dry_run=False):
         from .models import LockedUser
 
@@ -332,7 +332,7 @@ class UserTasks:
 
     @shared_task(
         bind=True,
-        ignore_result=True,
+        ignore_result=False,
         name=f"{__name__}.User:activate",
         max_retries=10,
     )
