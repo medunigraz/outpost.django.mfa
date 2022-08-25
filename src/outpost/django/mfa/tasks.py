@@ -185,7 +185,7 @@ class UserTasks:
                     logger.debug(
                         f"User {u.cn.value} is already locked from enrollment window {diff} for DUO"
                     )
-                    if user.unlocked:
+                    if not user.locked:
                         user.locked = timezone.now()
                         user.unlocked = None
                         user.save()
