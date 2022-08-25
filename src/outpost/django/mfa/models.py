@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .tasks import UserTasks
 
@@ -11,6 +12,7 @@ class LockedUser(models.Model):
 
     class Meta:
         ordering = ("local__last_name", "local__first_name")
+        permissions = (("unlock", _("Can unlock users for enrollment")),)
 
     @property
     def username(self):

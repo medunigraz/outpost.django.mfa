@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.utils.translation import gettext_lazy as _
 
 from . import (
@@ -43,6 +44,12 @@ class LockedUserAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_unlock_permission(self, request):
+        """Does the user have the publish permission?"""
+        opts = self.opts
+        codename = get_permission_codename("unlock", opts)
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
     def unlock(self, request, queryset):
         for user in queryset:
             tasks.UserTasks.unlock.delay(user.pk)
@@ -53,3 +60,4 @@ class LockedUserAdmin(admin.ModelAdmin):
         )
 
     unlock.short_description = _("Unlock selected users for new enrollment")
+    unlock.allowed_permissions = ("unlock",)
