@@ -101,7 +101,7 @@ class UserTasks:
                         logger.error(f"Could not add {u.cn.value} to mfa_group")
                         continue
                     if queue:
-                        UserTasks.activate.apply_async((u.cn.value,), queue=queue)
+                        UserTasks().activate.apply_async((u.cn.value,), queue=queue)
                         continue
                     try:
                         for attempt in retry.copy():
@@ -122,6 +122,11 @@ class UserTasks:
         User = get_user_model()
 
         logger.info("Locking users with expired DUO enrollment")
+
+        if task.request.delivery_info:
+            queue = task.request.delivery_info.get("routing_key")
+        else:
+            queue = None
 
         api = duo_client.Admin(
             ikey=settings.MFA_DUO_IKEY,
@@ -210,7 +215,10 @@ class UserTasks:
                     continue
             user, created = LockedUser.objects.get_or_create(local=local)
             if created or not user.locked:
-                transaction.on_commit(lambda: UserTasks().lock.delay(user.pk))
+                if queue:
+                    transaction.on_commit(lambda: UserTasks().lock.apply_async((user.pk,), queue=queue))
+                else:
+                    UserTasks.lock(user.pk)
 
     @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:lock")
     def lock(task, pk, dry_run=False):
