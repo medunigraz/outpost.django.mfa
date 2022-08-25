@@ -157,7 +157,7 @@ class UserTasks:
             attributes=("cn", "distinguishedName"),
         )
 
-        now = datetime.now()
+        now = timezone.now()
 
         delta = isodate.parse_duration(interval)
 
