@@ -8,12 +8,12 @@ import duo_client
 import isodate
 from celery import shared_task
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.db import transaction
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_auth_ldap.backend import LDAPBackend
-from django.utils import timezone
 from ldap3 import (
     ALL,
     SAFE_SYNC,
@@ -22,7 +22,12 @@ from ldap3 import (
     Reader,
     Server,
 )
-from tenacity import Retrying, RetryError, stop_after_attempt, wait_exponential
+from tenacity import (
+    RetryError,
+    Retrying,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from .conf import settings
 
@@ -72,7 +77,7 @@ class UserTasks:
 
         retry = Retrying(
             stop=stop_after_attempt(10),
-            wait=wait_exponential(multiplier=1, min=4, max=10)
+            wait=wait_exponential(multiplier=1, min=4, max=10),
         )
 
         for c, u in enumerate(reader.search()):
@@ -102,7 +107,9 @@ class UserTasks:
                         for attempt in retry.copy():
                             with attempt:
                                 logger.info(f"Activating user {u.cn.value} for DUO")
-                                api.sync_user(u.cn.value, settings.MFA_DUO_DIRECTORY_KEY)
+                                api.sync_user(
+                                    u.cn.value, settings.MFA_DUO_DIRECTORY_KEY
+                                )
                     except RetryError:
                         logger.error(f"Could not activate {u.cn.value} for DUO")
 
@@ -169,7 +176,9 @@ class UserTasks:
             try:
                 user = LockedUser.objects.get(local__username=u.cn.value)
             except LockedUser.DoesNotExist:
-                logger.debug(f"User {u.cn.value} is locked but no local objects has been found")
+                logger.debug(
+                    f"User {u.cn.value} is locked but no local objects has been found"
+                )
             else:
                 logger.debug(f"User {u.cn.value} has local lock object")
                 if u.distinguishedName.value in mfa_locked_group.member.values:
@@ -183,7 +192,9 @@ class UserTasks:
                     continue
                 if user.unlocked:
                     if now - user.unlocked < delta:
-                        logger.debug(f"User {u.cn.value} has local unlock and is within enrollment window")
+                        logger.debug(
+                            f"User {u.cn.value} has local unlock and is within enrollment window"
+                        )
                         continue
 
             if dry_run:
@@ -203,7 +214,7 @@ class UserTasks:
 
     @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:lock")
     def lock(task, pk, dry_run=False):
-        from.models import LockedUser
+        from .models import LockedUser
 
         user = LockedUser.objects.get(pk=pk)
 
@@ -235,9 +246,7 @@ class UserTasks:
         ad_user = next(iter(reader.search()), None)
 
         if ad_user.distinguishedName.value in mfa_locked_group.member.values:
-            logger.debug(
-                f"User {ad_user.cn.value} is already locked out from DUO"
-            )
+            logger.debug(f"User {ad_user.cn.value} is already locked out from DUO")
 
             user.unlocked = None
             if not user.locked:
@@ -249,15 +258,15 @@ class UserTasks:
                     user.locked = timezone.now()
                     user.unlocked = None
                 else:
-                    logger.error(f"Could not add {ad_user.cn.value} to MFA locked group")
+                    logger.error(
+                        f"Could not add {ad_user.cn.value} to MFA locked group"
+                    )
         if not dry_run:
             user.save()
 
-    @shared_task(
-        bind=True, ignore_result=True, name=f"{__name__}.User:unlock"
-    )
+    @shared_task(bind=True, ignore_result=True, name=f"{__name__}.User:unlock")
     def unlock(task, pk, dry_run=False):
-        from.models import LockedUser
+        from .models import LockedUser
 
         user = LockedUser.objects.get(pk=pk)
 
@@ -294,7 +303,9 @@ class UserTasks:
             return
 
         if ad_user.distinguishedName.value not in mfa_locked_group.member.values:
-            logger.warning(f"User {ad_user.cn.value} is no member of locked group in LDAP")
+            logger.warning(
+                f"User {ad_user.cn.value} is no member of locked group in LDAP"
+            )
             user.locked = None
             if not user.unlocked:
                 user.unlocked = timezone.now()
@@ -305,7 +316,9 @@ class UserTasks:
                     user.locked = None
                     user.unlocked = timezone.now()
                 else:
-                    logger.error(f"Could not remove {ad_user.cn.value} from mfa_group_locked")
+                    logger.error(
+                        f"Could not remove {ad_user.cn.value} from mfa_group_locked"
+                    )
         if not dry_run:
             user.save()
 
