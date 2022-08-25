@@ -52,7 +52,7 @@ class LockedUserAdmin(admin.ModelAdmin):
 
     def unlock(self, request, queryset):
         for user in queryset:
-            tasks.UserTasks.unlock.delay(user.pk)
+            tasks.UserTasks().unlock.apply_async((user.pk,), queue="maintainance")
         self.message_user(
             request,
             "%i successfully queued for unlocking. Please check again in a moment to see if they are gone from the list."
