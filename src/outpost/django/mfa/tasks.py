@@ -218,7 +218,9 @@ class UserTasks:
             user, created = LockedUser.objects.get_or_create(local=local)
             if created or not user.locked:
                 if queue:
-                    transaction.on_commit(lambda: UserTasks().lock.apply_async((user.pk,), queue=queue))
+                    transaction.on_commit(
+                        lambda: UserTasks().lock.apply_async((user.pk,), queue=queue)
+                    )
                 else:
                     UserTasks.lock(user.pk)
 
