@@ -45,10 +45,8 @@ class LockedUserAdmin(admin.ModelAdmin):
         return False
 
     def has_unlock_permission(self, request):
-        """Does the user have the publish permission?"""
-        opts = self.opts
-        codename = get_permission_codename("unlock", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        """Does the user have the unlock permission?"""
+        return request.user.has_perm(f"{self.opts.app_label}.unlock")
 
     def unlock(self, request, queryset):
         for user in queryset:
