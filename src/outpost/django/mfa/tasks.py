@@ -337,6 +337,29 @@ class UserTasks:
     @shared_task(
         bind=True,
         ignore_result=False,
+        name=f"{__name__}.User:cleanup",
+    )
+    def cleanup(task):
+        api = duo_client.Admin(
+            ikey=settings.MFA_DUO_IKEY,
+            skey=settings.MFA_DUO_SKEY,
+            host=settings.MFA_DUO_API_HOST,
+        )
+
+        for u in api.get_users():
+            for p in u.get("phones", []):
+                if not p.get("number"):
+                    continue
+                if p.get("activated"):
+                    continue
+                user_id = u.get("user_id")
+                phone_id = p.get("phone_id")
+                logger.warning(f"Remove phone {phone_id} from user {user_id}")
+                api.delete_user_phone(user_id, phone_id)
+
+    @shared_task(
+        bind=True,
+        ignore_result=False,
         name=f"{__name__}.User:activate",
         max_retries=10,
     )
