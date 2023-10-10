@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.utils.translation import gettext_lazy as _
+from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.contenttypes.models import ContentType
 
 from . import (
     models,
@@ -51,6 +53,13 @@ class LockedUserAdmin(admin.ModelAdmin):
     def unlock(self, request, queryset):
         for user in queryset:
             tasks.UserTasks().unlock.apply_async((user.pk,), queue="maintainance")
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(user.__class__).pk,
+                object_id=user.id,
+                object_repr=user.username,
+                action_flag=DELETION,
+            )
         self.message_user(
             request,
             "%i successfully queued for unlocking. Please check again in a moment to see if they are gone from the list."
