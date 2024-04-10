@@ -15,6 +15,7 @@ class MFAAppConf(AppConf):
     LDAP_PASSWORD = None
     LDAP_GROUP_USERS = None
     LDAP_GROUP_USERS_LOCKED = None
+    ENROLLMENT_URL = "https://localhost"
 
     class Meta:
         prefix = "mfa"

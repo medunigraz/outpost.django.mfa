@@ -1,8 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from .tasks import UserTasks
+from netfields import (
+    CidrAddressField,
+    NetManager,
+)
+from outpost.django.base.utils import Uuid4Upload
+from outpost.django.base.validators import FileValidator
 
 
 class LockedUser(models.Model):
@@ -32,3 +36,26 @@ class LockedUser(models.Model):
 
     def __str__(self):
         return self.local.username
+
+
+class UnlockEvent(models.Model):
+    local = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(
+        upload_to=Uuid4Upload,
+        null=True,
+        validators=(FileValidator(mimetypes=["image/png"]),),
+    )
+
+    def __str__(self):
+        return f"{self.local}: {self.created}"
+
+
+class UnlockNetwork(models.Model):
+    name = models.CharField(max_length=256)
+    inet = CidrAddressField()
+
+    objects = NetManager()
+
+    def __str__(self):
+        return f"{self.name} ({self.inet})"

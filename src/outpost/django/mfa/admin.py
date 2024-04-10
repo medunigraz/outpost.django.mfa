@@ -1,8 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth import get_permission_codename
-from django.utils.translation import gettext_lazy as _
-from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.models import (
+    DELETION,
+    LogEntry,
+)
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import gettext_lazy as _
 
 from . import (
     models,
@@ -68,3 +70,50 @@ class LockedUserAdmin(admin.ModelAdmin):
 
     unlock.short_description = _("Unlock selected users for new enrollment")
     unlock.allowed_permissions = ("unlock",)
+
+
+@admin.register(models.UnlockEvent)
+class UnlockEventAdmin(admin.ModelAdmin):
+    list_display = (
+        "username",
+        "created",
+    )
+    search_fields = (
+        "local__username",
+        "local__email",
+        "local__first_name",
+        "local__last_name",
+    )
+    date_hierarchy = "created"
+    readonly_fields = (
+        "local",
+        "created",
+        "image",
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("local")
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def username(self, obj):
+        return obj.local.username
+
+
+@admin.register(models.UnlockNetwork)
+class UnlockNetworkAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "inet",
+    )
+    search_fields = (
+        "name",
+        "inet",
+    )

@@ -1,11 +1,13 @@
 import logging
 from datetime import (
+    date,
     datetime,
     timedelta,
 )
 
 import duo_client
 import isodate
+import requests
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.core.cache import caches
@@ -356,6 +358,68 @@ class UserTasks:
                 phone_id = p.get("phone_id")
                 logger.warning(f"Remove phone {phone_id} from user {user_id}")
                 api.delete_user_phone(user_id, phone_id)
+
+    @shared_task(
+        bind=True,
+        ignore_result=False,
+        name=f"{__name__}.User:form",
+    )
+    def form(task, url, base_dn):
+        from .models import LockedUser
+
+        if task.request.delivery_info:
+            queue = task.request.delivery_info.get("routing_key")
+        else:
+            queue = None
+
+        today = date.today().strftime("%d.%m.%Y")
+
+        ldap = Connection(
+            Server(settings.MFA_LDAP_HOST, get_info=ALL),
+            settings.MFA_LDAP_BIND_DN,
+            settings.MFA_LDAP_PASSWORD,
+            auto_bind=True,
+            auto_range=True,
+            client_strategy=SAFE_SYNC,
+        )
+
+        mfa_group = (
+            Reader(ldap, ObjectDef("group", ldap), settings.MFA_LDAP_GROUP_USERS)
+            .search_object()
+            .entry_writable()
+        )
+
+        person = ObjectDef("person", ldap)
+
+        try:
+            with requests.get(url.format(today=today)) as response:
+                usernames = [
+                    b.get("benutzername")
+                    for b in response.json().get("result", [])
+                    if b.get("benutzername")
+                ]
+        except requests.HTTPError:
+            if task.request.delivery_info:
+                task.retry(countdown=3 ** task.request.retries)
+
+        for username in usernames:
+            reader = Reader(ldap, person, base_dn, f"(cn={username})")
+            user = next(iter(reader.search() or []), None)
+            if not user:
+                continue
+            if user.distinguishedName.value not in mfa_group.member.values:
+                mfa_group.member += user.distinguishedName.value
+                if mfa_group.entry_commit_changes():
+                    logger.info(f"Added {username}")
+                    UserTasks().activate.apply_async((username,), queue=queue)
+                else:
+                    logger.info(f"Error {username}")
+            try:
+                locked = LockedUser.objects.get(local__username=username)
+            except LockedUser.DoesNotExist:
+                continue
+            else:
+                UserTasks().unlock.apply_async((locked.pk,), queue=queue)
 
     @shared_task(
         bind=True,

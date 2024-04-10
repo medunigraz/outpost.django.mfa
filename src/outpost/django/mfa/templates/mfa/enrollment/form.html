@@ -1,0 +1,43 @@
+{% extends 'mfa/enrollment/base.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block script %}
+{{ block.super }}
+<script src="{% static "mfa/enrollment/webcam.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="card m-3">
+  <h5 class="card-header">
+    {% blocktrans with first_name=user.first_name last_name=user.last_name %}
+    Unlock MFA enrollment for {{ first_name }} {{ last_name }}
+    {% endblocktrans %}
+  </h5>
+    <div class="row no-gutters">
+      <div class="col-md-4">
+        <div class="w-75 mx-auto mt-5">
+          <img class="" src="{% static "logo_color.svg" %}" alt="image">
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="">
+          <video class="card-img-top" id="video">Video stream not available.</video>
+        </div>
+      </div>
+    </div>
+  <div class="card-body">
+    <h5 class="card-title">
+      {% blocktrans %}
+      You can unlock the enrollment process for Multi-Factor-Authentication again. A picture of you will be saved for a period of <strong>X days</strong> in case we need to further verify your identity. Afterwards you will be taken directly to the enrollment process to activate your first MFA device. If you do not finisch it in <strong>10 minutes</strong>, this application will restart and you have <strong>3 days</strong> to complete the process on any other site or by authenticationg again on this terminal.
+      {% endblocktrans %}
+    </h5>
+    <p class="card-text">
+    {% crispy form %}
+    </p>
+    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+  </div>
+</div>
+<canvas id="canvas" class="d-none"></canvas>
+{% endblock %}
