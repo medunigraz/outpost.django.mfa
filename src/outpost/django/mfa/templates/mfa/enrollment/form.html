@@ -9,12 +9,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="card m-3">
-  <h5 class="card-header">
+<div class="card well m-3">
+  <h1 class="card-header">
     {% blocktrans with first_name=user.first_name last_name=user.last_name %}
     Unlock MFA enrollment for {{ first_name }} {{ last_name }}
     {% endblocktrans %}
-  </h5>
+  </h1>
     <div class="row no-gutters">
       <div class="col-md-4">
         <div class="w-75 mx-auto mt-5">
