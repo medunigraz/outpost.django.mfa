@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="card well m-3">
+<div class="card m-3">
   <h1 class="card-header">
     {% blocktrans with first_name=user.first_name last_name=user.last_name %}
     Unlock MFA enrollment for {{ first_name }} {{ last_name }}
@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="col-md-8">
-        <video style="width: 100%" id="video">Video stream not available.</video>
+        <video class="rounded w-100" id="video">Video stream not available.</video>
       </div>
     </div>
   <div class="card-body">

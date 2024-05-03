@@ -7,6 +7,7 @@ from crispy_forms.layout import (
 )
 from django import forms
 from django.utils.translation import gettext as _
+from outpost.django.base.layout import IconButton
 
 
 class EnrollmentUnlockForm(forms.Form):
@@ -22,9 +23,10 @@ class EnrollmentUnlockForm(forms.Form):
         self.helper.layout = Layout(
             Field("terms_accepted"),
             Hidden("image", id="image", value=""),
-            Submit(
-                "unlock",
+            IconButton(
+                "fa fa-unlock",
                 _("Unlock my account"),
+                type="submit",
                 css_class="btn btn-primary btn-lg btn-block",
             ),
         )
