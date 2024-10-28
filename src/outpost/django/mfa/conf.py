@@ -1,5 +1,3 @@
-import os
-
 from appconf import AppConf
 from django.conf import settings
 
@@ -15,7 +13,10 @@ class MFAAppConf(AppConf):
     LDAP_PASSWORD = None
     LDAP_GROUP_USERS = None
     LDAP_GROUP_USERS_LOCKED = None
-    ENROLLMENT_URL = "https://localhost"
+    ENROLLMENT_URL = "http://localhost"
+    ENROLLMENT_PHOTO_EXPIRATION_DAYS = 14
+    ENROLLMENT_WINDOW_DAYS = 3
+    ENROLLMENT_HELP_URL = "http://localhost"
 
     class Meta:
         prefix = "mfa"

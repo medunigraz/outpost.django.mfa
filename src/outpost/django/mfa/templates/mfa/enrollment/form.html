@@ -2,6 +2,7 @@
 {% load static %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+{% load qr_code %}
 
 {% block script %}
 {{ block.super }}
@@ -15,25 +16,28 @@
     Unlock MFA enrollment for {{ first_name }} {{ last_name }}
     {% endblocktrans %}
   </h1>
-    <div class="row no-gutters">
-      <div class="col-md-4">
-        <div class="w-75 mx-auto mt-5">
-          <img class="" src="{% static "logo_color.svg" %}" alt="image">
-        </div>
-      </div>
-      <div class="col-md-8">
-        <video class="rounded w-100" id="video">Video stream not available.</video>
+  <div class="row no-gutters">
+    <div class="col-md-4">
+      <div class="w-75 mx-auto mt-5">
+        <img class="" src="{% static "logo_color.svg" %}" alt="image">
       </div>
     </div>
-  <div class="card-body">
-    <h5 class="card-title">
-      {% blocktrans %}
-      You can unlock the enrollment process for Multi-Factor-Authentication again. A picture of you will be saved for a period of <strong>X days</strong> in case we need to further verify your identity. Afterwards you will be taken directly to the enrollment process to activate your first MFA device. If you do not finisch it in <strong>10 minutes</strong>, this application will restart and you have <strong>3 days</strong> to complete the process on any other site or by authenticationg again on this terminal.
+    <div class="col-md-8">
+      <video class="rounded w-100" id="video">Video stream not available.</video>
+    </div>
+  </div>
+  <div class="card-body d-flex justify-content-around align-items-start">
+    <h5>
+      {% blocktrans with photo_expiration=MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS enrollment_window=MFA_ENROLLMENT_WINDOW_DAYS %}
+      You can unlock the enrollment process for Multi-Factor-Authentication again. A picture of you will be saved for a period of <strong>{{ photo_expiration }} days</strong> in case we need to further verify your identity. Afterwards you will be taken directly to the enrollment process to activate your first MFA device. If you do not finish it before the progress bar at the top of the screen fills up, this application will restart and you have <strong>{{ enrollment_window }} days</strong> to complete the process on any other site of the MedUniGraz or by authenticating again on this terminal. Please scan the <strong>QR code</strong> to the right for more instructions on completing the MFA enrollment.
       {% endblocktrans %}
     </h5>
-    <p class="card-text">
+    <div>
+      {% qr_from_text MFA_ENROLLMENT_HELP_URL size="S" %}
+    </div>
+  </div>
+  <div class="card-footer">
     {% crispy form %}
-    </p>
   </div>
 </div>
 <canvas id="canvas" class="d-none" style="display: none"></canvas>

@@ -29,20 +29,28 @@ class EnrollmentUnlockView(LoginRequiredMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        # try:
-        #     models.LockedUser.objects.get(local=request.user)
-        # except models.LockedUser.DoesNotExist:
-        #     return HttpResponseRedirect(self.get_success_url())
+        try:
+            models.LockedUser.objects.get(local=request.user)
+        except models.LockedUser.DoesNotExist:
+            return HttpResponseRedirect(self.get_success_url())
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # try:
-        #     user = models.LockedUser.objects.get(local=request.user)
-        #     UserTasks.unlock(user.pk).delay()
-        # except models.LockedUser.DoesNotExist:
-        #     return HttpResponseRedirect(self.get_success_url())
+        try:
+            user = models.LockedUser.objects.get(local=request.user)
+            UserTasks().unlock(user.pk)
+        except models.LockedUser.DoesNotExist:
+            return HttpResponseRedirect(self.get_success_url())
         with urlopen(form.cleaned_data.get("image")) as response:
             data = response.read()
         image = ContentFile(data, "cam.png")
         models.UnlockEvent.objects.create(local=self.request.user, image=image)
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        kwargs[
+            "MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS"
+        ] = settings.MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS
+        kwargs["MFA_ENROLLMENT_WINDOW_DAYS"] = settings.MFA_ENROLLMENT_WINDOW_DAYS
+        kwargs["MFA_ENROLLMENT_HELP_URL"] = settings.MFA_ENROLLMENT_HELP_URL
+        return super().get_context_data(**kwargs)

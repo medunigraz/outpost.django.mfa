@@ -1,0 +1,70 @@
+# outpost.django.mfa translations
+# Copyright (C) 2024, Michael Fladischer <michael.fladischer@medunigraz.at>
+# This file is distributed under the same license as the outpost.django.mfa package.
+# Michael Fladischer <michael.fladischer@medunigraz.at>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: outpost.django.mfa development\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-28 16:33+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Michael Fladischer <michael.fladischer@medunigraz.at>, 2024\n"
+"Language-Team: Michael Fladischer <michael.fladischer@medunigraz.at>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: admin.py:71
+msgid "Unlock selected users for new enrollment"
+msgstr "Ausgewählte Benutzer für Neuregistrierung freischalten"
+
+#: forms.py:28
+msgid "Unlock my account"
+msgstr "Mein Konto entsperren"
+
+#: models.py:19
+msgid "Can unlock users for enrollment"
+msgstr "Kann Benutzer für die Registrierung freischalten"
+
+#: templates/mfa/enrollment/form.html:15
+#, python-format
+msgid ""
+"\n"
+"    Unlock MFA enrollment for %(first_name)s %(last_name)s\n"
+"    "
+msgstr ""
+"\n"
+"    MFA-Registrierung für %(first_name)s %(last_name)s freischalten\n"
+"    "
+
+#: templates/mfa/enrollment/form.html:31
+#, python-format
+msgid ""
+"\n"
+"      You can unlock the enrollment process for Multi-Factor-Authentication "
+"again. A picture of you will be saved for a period of <strong>"
+"%(photo_expiration)s days</strong> in case we need to further verify your "
+"identity. Afterwards you will be taken directly to the enrollment process to "
+"activate your first MFA device. If you do not finish it before the progress "
+"bar at the top of the screen fills up, this application will restart and you "
+"have <strong>%(enrollment_window)s days</strong> to complete the process on "
+"any other site of the MedUniGraz or by authenticating again on this "
+"terminal. Please scan the <strong>QR code</strong> to the right for more "
+"instructions on completing the MFA enrollment.\n"
+"      "
+msgstr ""
+"\n"
+"Sie können den Registrierungsprozess für die Multi-Faktor-Authentifizierung "
+"erneut freischalten. Ein Bild von Ihnen wird für einen Zeitraum von <strong>"
+"%(photo_expiration)s Tagen</strong> gespeichert, falls wir Ihre "
+"Identität noch einmal überprüfen müssen. Anschließend gelangen Sie direkt zum Registrierungsprozess, um "
+"Ihr erstes MFA-Gerät zu aktivieren. Wenn Sie diesen nicht abschließen, bevor der "
+"Fortschrittsbalken am oberen Bildschirmrand voll ist, wird diese Anwendung neu gestartet und Sie "
+"haben <strong>%(enrollment_window)s Tage</strong> Zeit, den Prozess "
+"an einer beliebigen anderen Website der MedUniGraz oder durch erneute Authentifizierung an diesem "
+"Terminal abzuschließen. Bitte scannen Sie den <strong>QR-Code</strong> rechts, um "
+"weitere Anweisungen zum Abschluss der MFA-Registrierung zu erhalten.\n"
+"      "
