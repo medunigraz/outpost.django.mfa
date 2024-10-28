@@ -224,7 +224,7 @@ class UserTasks:
                         lambda: UserTasks().lock.apply_async((user.pk,), queue=queue)
                     )
                 else:
-                    UserTasks.lock(user.pk)
+                    UserTasks().lock(user.pk)
 
     @shared_task(bind=True, ignore_result=False, name=f"{__name__}.User:lock")
     def lock(task, pk, dry_run=False):

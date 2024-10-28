@@ -37,7 +37,7 @@ class EnrollmentUnlockView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         try:
-            user = models.LockedUser.objects.get(local=request.user)
+            user = models.LockedUser.objects.get(local=self.request.user)
             UserTasks().unlock(user.pk)
         except models.LockedUser.DoesNotExist:
             return HttpResponseRedirect(self.get_success_url())
