@@ -21,7 +21,6 @@ class EnrollmentUnlockForm(forms.Form):
         self.helper.form_tag = True
         self.helper.form_id = "form"
         self.helper.layout = Layout(
-            Field("terms_accepted"),
             Hidden("image", id="image", value=""),
             IconButton(
                 "fa fa-unlock",
