@@ -400,7 +400,7 @@ class UserTasks:
                 ]
         except requests.HTTPError:
             if task.request.delivery_info:
-                task.retry(countdown=3 ** task.request.retries)
+                task.retry(countdown=3**task.request.retries)
 
         for username in usernames:
             reader = Reader(ldap, person, base_dn, f"(cn={username})")
@@ -453,7 +453,7 @@ class UserTasks:
         if settings.MFA_LDAP_GROUP_USERS not in ad_user.memberOf.values:
             logger.error(f"User {username} not present in MFA LDAP group.")
             if task.request.delivery_info:
-                task.retry(countdown=3 ** task.request.retries)
+                task.retry(countdown=3**task.request.retries)
             return
 
         logger.info(f"Activating user {username} for DUO")
@@ -463,4 +463,4 @@ class UserTasks:
         except RuntimeError:
             logger.error(f"Could not activate {username} for DUO")
             if task.request.delivery_info:
-                task.retry(countdown=3 ** task.request.retries)
+                task.retry(countdown=3**task.request.retries)

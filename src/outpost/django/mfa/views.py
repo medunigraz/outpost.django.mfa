@@ -48,9 +48,9 @@ class EnrollmentUnlockView(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs[
-            "MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS"
-        ] = settings.MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS
+        kwargs["MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS"] = (
+            settings.MFA_ENROLLMENT_PHOTO_EXPIRATION_DAYS
+        )
         kwargs["MFA_ENROLLMENT_WINDOW_DAYS"] = settings.MFA_ENROLLMENT_WINDOW_DAYS
         kwargs["MFA_ENROLLMENT_HELP_URL"] = settings.MFA_ENROLLMENT_HELP_URL
         return super().get_context_data(**kwargs)
