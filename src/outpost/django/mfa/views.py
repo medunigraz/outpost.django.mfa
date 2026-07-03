@@ -1,6 +1,6 @@
 from urllib.request import urlopen
 
-from braces.views import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
 from django.views.generic import FormView
