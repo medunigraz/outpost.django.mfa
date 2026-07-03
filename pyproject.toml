@@ -1,0 +1,40 @@
+[project]
+name = "outpost.django.mfa"
+dynamic = ["version"]
+description = "MUG API Backend - MFA"
+authors = [
+    {name = "Michael Fladischer",email = "michael.fladischer@medunigraz.at"}
+]
+license = {text = "BSD"}
+readme = "README.rst"
+requires-python = ">=3.13"
+dependencies = [
+    "django (>=4.2.23)",
+    "django-appconf (>=1.0.6)",
+    "django-crispy-forms (>=2.4)",
+    "django-netfields (>=1.3.2)",
+    "duo-client (>=5.5.0)",
+    "isodate (>=0.7.0)",
+    "ldap3 (>=2.9.1)",
+    "requests (>=2.32.3)",
+    "tenacity (>=8.4.1)",
+    "celery (>=5.5.2)",
+]
+
+[build-system]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+force_grid_wrap = 2
+force_to_top = False
+line_length = 120
+force_grid_wrap = 2
+known_first_party = outpost.django.mfa
+known_third_party = django,outpost
+default_section = THIRDPARTY
