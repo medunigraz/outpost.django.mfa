@@ -54,7 +54,7 @@ class LockedUserAdmin(admin.ModelAdmin):
 
     def unlock(self, request, queryset):
         for user in queryset:
-            tasks.UserTasks().unlock.apply_async((user.pk,), queue="maintainance")
+            tasks.UserTasks().unlock.apply_async((user.pk,), queue="maintenance")
             LogEntry.objects.log_action(
                 user_id=request.user.id,
                 content_type_id=ContentType.objects.get_for_model(user.__class__).pk,
