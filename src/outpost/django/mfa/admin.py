@@ -6,6 +6,8 @@ from django.contrib.admin.models import (
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
+from outpost.django.base.admin import ReadOnlyAdminMixin
+
 from . import (
     models,
     tasks,
@@ -13,7 +15,7 @@ from . import (
 
 
 @admin.register(models.LockedUser)
-class LockedUserAdmin(admin.ModelAdmin):
+class LockedUserAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = (
         "pk",
         "username",
@@ -38,15 +40,6 @@ class LockedUserAdmin(admin.ModelAdmin):
             .exclude(unlocked__isnull=False)
             .select_related("local")
         )
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
     def has_unlock_permission(self, request):
         """Does the user have the unlock permission?"""
@@ -73,7 +66,7 @@ class LockedUserAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.UnlockEvent)
-class UnlockEventAdmin(admin.ModelAdmin):
+class UnlockEventAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = (
         "username",
         "created",
@@ -85,23 +78,9 @@ class UnlockEventAdmin(admin.ModelAdmin):
         "local__last_name",
     )
     date_hierarchy = "created"
-    readonly_fields = (
-        "local",
-        "created",
-        "image",
-    )
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("local")
-
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
     def username(self, obj):
         return obj.local.username
