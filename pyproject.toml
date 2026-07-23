@@ -3,7 +3,7 @@ name = "outpost.django.mfa"
 dynamic = ["version"]
 description = "MUG API Backend - MFA"
 authors = [
-    {name = "Michael Fladischer",email = "michael.fladischer@medunigraz.at"}
+    {name = "Michael Fladischer", email = "michael.fladischer@medunigraz.at"}
 ]
 license = {text = "BSD"}
 readme = "README.rst"
@@ -32,9 +32,8 @@ where = ["src"]
 profile = "black"
 multi_line_output = 3
 force_grid_wrap = 2
-force_to_top = False
+force_to_top = false
 line_length = 120
-force_grid_wrap = 2
-known_first_party = outpost.django.mfa
-known_third_party = django,outpost
-default_section = THIRDPARTY
+known_first_party = "outpost.django.mfa"
+known_third_party = "django,outpost"
+default_section = "THIRDPARTY"
